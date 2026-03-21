@@ -2,139 +2,321 @@
 ## Trading Platform Engine Ecosystem
 
 Version: 1.0  
-Purpose: Define system structure, data flow, and module interactions  
-Audience: Codex, Developers, Architects  
+Scope: System Flow & Module Interaction Only  
+Audience: Architects, Developers  
 
 ---
 
-# 1. ARCHITECTURAL STYLE
+# 1. SYSTEM STRUCTURE
 
-## 1.1 Core Architecture
+The system is a **modular event-driven trading platform** composed of independent engines.
 
-The system follows a:
+Each engine performs a specific role in the trading lifecycle.
 
-> **Modular + Event-Driven Architecture**
-
-Each module:
-
-- Operates independently
-- Communicates via events
-- Has a single responsibility
+The system processes data in a **unidirectional flow**.
 
 ---
 
-## 1.2 Architectural Goals
+# 2. HIGH-LEVEL FLOW
 
-The system is designed to achieve:
+End-to-end system flow:
 
-- Modularity
-- Deterministic behavior
-- Extensibility
-- Scalability
-- Broker independence
-
----
-
-# 2. HIGH-LEVEL SYSTEM FLOW
-
-## 2.1 End-to-End Flow
 Market Data Engine
-↓
-Indicator Engine
-↓
+        ↓
+Indicators Engine
+        ↓
 Scanner Engine
-↓
+        ↓
 Entry Engine
-↓
+        ↓
 Trade Lifecycle
-↓
+        ↓
 Exit Engine
-↓
+        ↓
 Execution Infrastructure
-
----
-
-## 2.2 Flow Explanation
-
-### Step 1: Market Data
-- Receives tick data
-- Aggregates candles
-- Publishes market events
-
-### Step 2: Indicators
-- Compute technical indicators
-- Maintain indicator state
-- Publish indicator updates
-
-### Step 3: Scanner
-- Iterates over instruments
-- Evaluates strategies
-- Generates signals
-
-### Step 4: Entry
-- Validates signals
-- Produces EntrySignal
-
-### Step 5: Trade Lifecycle
-- Creates trade context
-- Manages trade state transitions
-
-### Step 6: Exit Engine
-- Monitors active trades
-- Updates stop loss
-- Triggers exit
-
-### Step 7: Execution
-- Places orders
-- Modifies orders
-- Tracks execution
 
 ---
 
 # 3. CORE MODULES
 
-## 3.1 Module List
+The system consists of the following modules:
 
-| Module | Responsibility |
-|--------|---------------|
-trading-domain | Shared models |
-indicators-engine | Indicator computation |
-strategy-composition | Strategy definition |
-entry-engine | Entry signal generation |
-exit-engine | Exit logic & risk |
-market-data-engine | Market data |
-scanner-engine | Instrument scanning |
-trade-lifecycle | State machine |
-execution-infrastructure | Broker execution |
-orchestrator-core | System coordination |
+- trading-domain
+- indicators-engine
+- strategy-composition
+- entry-engine
+- exit-engine
+- market-data-engine
+- scanner-engine
+- trade-lifecycle
+- execution-infrastructure
+- orchestrator-core
 
----
-
-## 3.2 Module Independence Rules
-
-- Modules must not depend on each other directly
-- Communication must occur via events
-- No circular dependencies allowed
+Each module has a clearly defined responsibility.
 
 ---
 
-# 4. EVENT-DRIVEN SYSTEM
+# 4. MODULE RESPONSIBILITIES
 
-## 4.1 Event Bus
+## 4.1 trading-domain
 
-The system uses an **event bus** for communication.
+Purpose:
+
+- defines core data models
 
 Responsibilities:
 
-- Publish events
-- Route events
-- Notify subscribers
+- represent system state
+- provide shared structures
+
+Examples:
+
+- TradeContext
+- Candle
+- Instrument
+- EntrySignal
+- ExitDecision
 
 ---
 
-## 4.2 Core Events
+## 4.2 market-data-engine
 
-The system defines standard event types:
+Purpose:
+
+- provides market data to the system
+
+Responsibilities:
+
+- receive tick data
+- aggregate candles
+- publish market events
+
+Output:
+
+- MarketTickEvent
+
+---
+
+## 4.3 indicators-engine
+
+Purpose:
+
+- computes technical indicators
+
+Responsibilities:
+
+- calculate indicator values
+- maintain indicator pipelines
+- share indicator results
+
+Output:
+
+- IndicatorUpdatedEvent
+
+---
+
+## 4.4 strategy-composition
+
+Purpose:
+
+- defines strategy logic
+
+Responsibilities:
+
+- build condition trees
+- evaluate logical conditions
+
+Output:
+
+- condition evaluation results
+
+---
+
+## 4.5 scanner-engine
+
+Purpose:
+
+- evaluate strategies across instruments
+
+Responsibilities:
+
+- iterate instrument universe
+- evaluate strategies
+- generate signals
+
+Output:
+
+- EntrySignalEvent
+
+---
+
+## 4.6 entry-engine
+
+Purpose:
+
+- generate entry signals
+
+Responsibilities:
+
+- validate entry conditions
+- produce entry signals
+
+Output:
+
+- EntrySignalEvent
+
+---
+
+## 4.7 trade-lifecycle
+
+Purpose:
+
+- manage trade state
+
+Responsibilities:
+
+- create trade context
+- manage state transitions
+- coordinate trade flow
+
+Output:
+
+- TradeOpenedEvent
+- TradeCompletedEvent
+
+---
+
+## 4.8 exit-engine
+
+Purpose:
+
+- manage trade exits
+
+Responsibilities:
+
+- update stop loss
+- manage profit protection
+- trigger exits
+
+Output:
+
+- ExitTriggeredEvent
+
+---
+
+## 4.9 execution-infrastructure
+
+Purpose:
+
+- interact with broker systems
+
+Responsibilities:
+
+- place orders
+- modify orders
+- confirm execution
+
+Output:
+
+- OrderFilledEvent
+
+---
+
+## 4.10 orchestrator-core
+
+Purpose:
+
+- coordinate system components
+
+Responsibilities:
+
+- manage event flow
+- route events
+- maintain execution order
+
+---
+
+# 5. DATA FLOW
+
+## 5.1 Market Data Flow
+
+MarketDataFeed
+    ↓
+Tick Data
+    ↓
+Candle Aggregation
+    ↓
+MarketTickEvent
+
+---
+
+## 5.2 Indicator Flow
+
+MarketTickEvent
+    ↓
+Indicator Engine
+    ↓
+Indicator Pipeline Update
+    ↓
+IndicatorUpdatedEvent
+
+---
+
+## 5.3 Strategy Evaluation Flow
+
+IndicatorUpdatedEvent
+    ↓
+Scanner Engine
+    ↓
+Strategy Evaluation
+    ↓
+EntrySignalEvent
+
+---
+
+## 5.4 Trade Initiation Flow
+
+EntrySignalEvent
+    ↓
+Trade Lifecycle
+    ↓
+Trade Context Creation
+    ↓
+TradeOpenedEvent
+
+---
+
+## 5.5 Exit Evaluation Flow
+
+PriceUpdateEvent
+    ↓
+Exit Engine
+    ↓
+Exit Decision
+    ↓
+ExitTriggeredEvent
+
+---
+
+## 5.6 Execution Flow
+
+ExitTriggeredEvent
+    ↓
+Execution Infrastructure
+    ↓
+Order Placement
+    ↓
+OrderFilledEvent
+    ↓
+TradeCompletedEvent
+
+---
+
+# 6. EVENT SYSTEM
+
+The system is driven by events.
+
+Core event types:
 
 - MarketTickEvent
 - IndicatorUpdatedEvent
@@ -147,313 +329,143 @@ The system defines standard event types:
 
 ---
 
-## 4.3 Event Rules
+# 7. EVENT FLOW PRINCIPLE
 
-- Events must be immutable
-- Events must contain required context
-- No module should depend on event producers
+All modules interact using:
 
----
+- event publishing
+- event subscription
 
-# 5. DATA FLOW MODEL
-
-## 5.1 Market Data Flow
-MarketDataFeed
-↓
-CandleAggregator
-↓
-MarketTickEvent
+There is no direct communication between modules.
 
 ---
 
-## 5.2 Indicator Flow
-MarketTickEvent
-↓
-IndicatorPipeline
-↓
-IndicatorUpdatedEvent
+# 8. MULTI-STRATEGY SUPPORT
+
+The system supports multiple strategies simultaneously.
+
+Key behavior:
+
+- indicators are computed once per instrument
+- results are shared across strategies
+- strategies operate independently
 
 ---
 
-## 5.3 Strategy Flow
-Indicator Values
-↓
-Condition Evaluation
-↓
-EntrySignalEvent
+# 9. MULTI-INSTRUMENT SUPPORT
+
+The system supports multiple instruments.
+
+Key behavior:
+
+- each instrument has independent evaluation
+- shared indicator pipelines are reused
+- scanner handles instrument iteration
 
 ---
 
-## 5.4 Trade Flow
-EntrySignalEvent
-↓
-TradeContext Creation
-↓
-Trade State Updates
+# 10. TRADE FLOW SUMMARY
+
+Complete lifecycle:
+
+1. market data received  
+2. indicators updated  
+3. strategies evaluated  
+4. entry signal generated  
+5. trade created  
+6. exit monitored  
+7. exit triggered  
+8. order executed  
+9. trade completed  
 
 ---
 
-## 5.5 Exit Flow
-PriceUpdateEvent
-↓
-Exit Engine Evaluation
-↓
-ExitTriggeredEvent
+# 11. SYSTEM CHARACTERISTICS
+
+The system operates as:
+
+- event-driven
+- modular
+- stateless between modules (via events)
+- deterministic in processing
 
 ---
 
-## 5.6 Execution Flow
-ExitTriggeredEvent
-↓
-OrderExecutor
-↓
-OrderFilledEvent
-↓
-TradeCompletedEvent
+# 12. EXECUTION MODES
+
+The system supports multiple execution modes:
+
+- simulation
+- historical replay
+- paper trading
+- live trading
+
+Execution infrastructure adapts based on mode.
 
 ---
 
-# 6. INDICATOR EXECUTION MODEL
+# 13. SCALABILITY MODEL
 
-## 6.1 Shared Indicator Computation
+The system is designed to scale:
 
-Indicators must be:
+- per instrument
+- per strategy
+- per event stream
 
-- Calculated once per instrument
-- Shared across strategies
+Future scaling options:
 
-Example:
-
-Strategy A:
-- RSI + EMA20
-
-Strategy B:
-- RSI + VWAP
-
-Rule:
-
-> RSI must be computed only once and reused
+- distributed scanners
+- distributed event bus
+- microservice deployment
 
 ---
 
-## 6.2 Indicator Dependency Graph
+# 14. CONFIGURATION FLOW
 
-Indicators may depend on other indicators.
+Configuration is external.
 
-Example:
-ATR
-↓
-Supertrend
+Sources:
 
-Execution must ensure:
+- configuration files
+- environment variables
+- API inputs
 
-- Correct order
-- No duplication
-- Efficient updates
+Used by:
 
----
-
-# 7. STRATEGY EXECUTION MODEL
-
-## 7.1 Strategy Definition
-
-Strategies are defined as:
-
-> Logical condition trees
-
-Example:
-AND
-├ RSI > 60
-├ EMA20 > EMA50
-└ PRICE > VWAP
+- strategies
+- indicators
+- execution layer
 
 ---
 
-## 7.2 Strategy Evaluation
+# 15. ERROR HANDLING FLOW
 
-- Conditions evaluated using indicator values
-- Logical operators combine results
-- Final output → EntrySignal
+Failures may occur in:
 
----
+- market data
+- indicator computation
+- order execution
 
-# 8. SCANNER ENGINE
+System behavior:
 
-## 8.1 Responsibilities
-
-- Iterate instruments
-- Evaluate strategies
-- Generate signals
-- Deduplicate signals
+- propagate failure via events
+- maintain consistent trade state
+- avoid system-wide failure
 
 ---
 
-## 8.2 Multi-Strategy Handling
+# 16. FINAL SYSTEM VIEW
 
-- Multiple strategies can run per instrument
-- Shared indicators must not be recomputed
+The system is a pipeline of independent engines connected through events.
 
----
+Each module:
 
-# 9. TRADE LIFECYCLE SYSTEM
+- consumes events
+- processes data
+- produces events
 
-## 9.1 State Machine
-
-Trades move through states:
-SIGNALLED
-ORDER_PENDING
-ORDER_SENT
-PARTIALLY_FILLED
-FILLED
-ACTIVE
-EXIT_PENDING
-EXIT_SENT
-EXIT_FILLED
-COMPLETED
+The system progresses through continuous event flow.
 
 ---
 
-## 9.2 Rules
-
-- All transitions must be validated
-- No invalid state jumps allowed
-- State must always be consistent
-
----
-
-# 10. EXIT ENGINE INTEGRATION
-
-## 10.1 Input
-
-The Exit Engine receives:
-
-- PriceUpdateEvent
-- TradeContext
-
----
-
-## 10.2 Output
-
-The Exit Engine produces:
-
-- ExitTriggeredEvent
-
----
-
-## 10.3 Independence Rule
-
-The Exit Engine must NOT:
-
-- Know entry logic
-- Depend on scanner
-- Depend on strategy engine
-
----
-
-# 11. EXECUTION INFRASTRUCTURE
-
-## 11.1 Responsibilities
-
-- Place orders
-- Modify orders
-- Confirm executions
-- Handle failures
-
----
-
-## 11.2 Execution Modes
-
-The system supports:
-
-- Simulation
-- Historical Replay
-- Paper Trading
-- Live Trading
-
-Each mode must implement:
-
-- MarketDataFeed
-- OrderExecutor
-
----
-
-# 12. ORCHESTRATOR ROLE
-
-## 12.1 Purpose
-
-The orchestrator coordinates:
-
-- Engine startup
-- Event routing
-- Module integration
-
----
-
-## 12.2 Responsibilities
-
-- Initialize modules
-- Connect event flows
-- Manage sessions
-
----
-
-# 13. CONFIGURATION MODEL
-
-## 13.1 Configuration Sources
-
-Configuration must be externalized:
-
-- YAML files
-- Environment variables
-- API input
-- Database
-
----
-
-## 13.2 Example Config
-
-- indicatorParameters
-- strategyDefinitions
-- phaseThresholds
-- ownershipSettings
-- brokerSelection
-
----
-
-# 14. SCALABILITY MODEL
-
-Future scaling options include:
-
-- Distributed scanners
-- Distributed indicator engines
-- Event streaming (Kafka)
-- Microservices deployment
-
----
-
-# 15. FAULT TOLERANCE
-
-The system must handle:
-
-- Broker disconnection
-- Market data interruption
-- Order rejection
-- Network delays
-
-Trade lifecycle must remain consistent.
-
----
-
-# 16. FINAL SYSTEM PRINCIPLE
-
-The system is:
-
-- Event-driven
-- Modular
-- Deterministic
-- Extensible
-
-> Each engine is replaceable.  
-> The architecture must remain stable.
-
----
+# END OF FILE

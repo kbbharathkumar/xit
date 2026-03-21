@@ -2,426 +2,222 @@
 ## Trading Platform Engine Ecosystem
 
 Version: 1.0  
-Purpose: Enforce strict architectural constraints and industry standards  
-Audience: Codex, Developers, Architects  
+Scope: Non-Negotiable System Constraints  
+Audience: Developers, AI Agents  
 
 ---
 
-# 1. CORE PRINCIPLE
+# 1. GENERAL RULES
 
-The system must remain:
-
-- Modular  
-- Deterministic  
-- Extensible  
-- Broker-independent  
-- Entry-independent  
-
-Any change that violates these is not allowed.
+- Every module MUST have a single responsibility
+- Modules MUST be independently deployable in future
+- All interactions MUST be event-driven
+- System behavior MUST be deterministic
 
 ---
 
-# 2. SOLID PRINCIPLES (MANDATORY)
+# 2. MODULE DEPENDENCY RULES
 
-All code must strictly follow SOLID principles.
+Allowed dependency direction:
 
----
-
-## 2.1 Single Responsibility Principle (SRP)
-
-Each class must have exactly one responsibility.
-
-### Correct Examples
-
-- RSIIndicator → calculates RSI only  
-- IndicatorRegistry → manages indicator registration  
-- TradeStateMachine → handles state transitions  
-
-### Forbidden
-
-- Mixing multiple responsibilities in one class  
-- Combining entry and exit logic  
-- Combining calculation and execution logic  
+trading-domain
+    ↑
+indicators-engine
+    ↑
+strategy-composition
+    ↑
+entry-engine
+    ↑
+scanner-engine
+    ↑
+orchestrator-core
+    ↓
+exit-engine
+    ↓
+execution-infrastructure
 
 ---
 
-## 2.2 Open/Closed Principle (OCP)
+# 3. FORBIDDEN DEPENDENCIES
 
-The system must be open for extension and closed for modification.
-
-### Rules
-
-- Do not modify existing core classes  
-- Extend functionality using registries and factories  
-
-### Correct
-
-- Register new indicator via IndicatorRegistry  
-
-### Forbidden
-
-- Adding if-else chains for new types  
-- Adding switch-case logic for extensibility  
-- Modifying existing classes to add new features  
+- exit-engine MUST NOT depend on entry-engine
+- indicators-engine MUST NOT depend on strategy modules
+- execution-infrastructure MUST NOT depend on core logic
+- broker modules MUST NOT affect engine behavior
+- domain module MUST NOT depend on any other module
 
 ---
 
-## 2.3 Dependency Inversion Principle (DIP)
+# 4. EVENT COMMUNICATION RULES
 
-High-level modules must depend on interfaces only.
-
-### Allowed Interfaces
-
-- Indicator  
-- StreamingIndicator  
-- EntryStrategy  
-- ExitStrategy  
-- MarketDataFeed  
-- OrderExecutor  
-
-### Forbidden
-
-- Direct dependency on concrete implementations  
-- Using broker-specific classes inside core logic  
+- All cross-module communication MUST use events
+- Modules MUST NOT directly invoke other modules
+- Events MUST be immutable
+- Event payloads MUST contain complete required data
 
 ---
 
-# 3. MODULE BOUNDARY RULES
+# 5. DOMAIN LAYER RULES
+
+- Domain layer MUST contain only data models
+- Domain models MUST NOT contain business logic
+- Domain models MUST NOT depend on external libraries
+- Domain models SHOULD be immutable
 
 ---
 
-## 3.1 Dependency Order (STRICT)
+# 6. INDICATOR ARCHITECTURE RULES
 
-Modules must follow this dependency order (lowest to highest):
-
-1. trading-domain  
-2. indicators-engine  
-3. strategy-composition  
-4. entry-engine  
-5. scanner-engine  
-6. orchestrator-core  
-7. exit-engine  
-8. execution-infrastructure  
+- Indicator algorithm MUST be stateless
+- Indicator state MUST be separated
+- Indicators MUST be reusable across strategies
+- Indicators MUST be computed once per instrument
+- Streaming indicators MUST operate in constant time
 
 ---
 
-## 3.2 Dependency Rules
+# 7. STRATEGY COMPOSITION RULES
 
-- A module may depend only on modules above it in the list  
-- A module must never depend on modules below it  
-- Circular dependencies are strictly forbidden  
-
----
-
-## 3.3 Critical Constraint
-
-Exit Engine must NOT depend on:
-
-- entry-engine  
-- strategy-composition  
-- scanner-engine  
-
-Violation is strictly forbidden.
+- Strategies MUST be declarative
+- Strategies MUST be built using condition trees
+- Conditions MUST be composable
+- Strategy logic MUST NOT contain execution logic
 
 ---
 
-# 4. SEPARATION OF CONCERNS
+# 8. ENTRY ENGINE RULES
 
-Each module must handle only its defined responsibility.
-
----
-
-## 4.1 Responsibility Mapping
-
-| Concern                | Module                     |
-|-----------------------|---------------------------|
-| Indicator computation | indicators-engine         |
-| Strategy definition   | strategy-composition      |
-| Entry logic           | entry-engine              |
-| Exit logic            | exit-engine               |
-| Market data           | market-data-engine        |
-| Execution             | execution-infrastructure  |
-| Trade lifecycle       | trade-lifecycle           |
+- Entry engine MUST only generate signals
+- Entry engine MUST NOT manage trade lifecycle
+- Entry engine MUST NOT contain exit logic
+- Entry engine MUST NOT enforce risk rules
 
 ---
 
-## 4.2 Forbidden Violations
+# 9. EXIT ENGINE RULES
 
-- Exit logic inside entry engine  
-- Indicator calculation inside strategy layer  
-- Broker logic inside exit engine  
-- Strategy logic inside scanner  
-
----
-
-# 5. EVENT-DRIVEN RULES
+- Exit engine MUST operate independently of entry logic
+- Exit engine MUST enforce monotonic stop loss
+- Exit engine MUST operate on TradeContext only
+- Exit engine MUST NOT depend on broker implementations
+- Exit engine MUST NOT depend on strategy logic
+- Exit engine MUST be single-trade scoped
 
 ---
 
-## 5.1 Communication Model
+# 10. TRADE LIFECYCLE RULES
 
-All inter-module communication must occur through events.
+Valid states:
 
----
+SIGNALLED
+ORDER_PENDING
+ORDER_SENT
+FILLED
+ACTIVE
+EXIT_PENDING
+EXIT_SENT
+EXIT_FILLED
+COMPLETED
 
-## 5.2 Forbidden Patterns
+Rules:
 
-- Direct method calls across modules  
-- Shared mutable state  
-- Tight coupling between modules  
-
----
-
-## 5.3 Event Requirements
-
-Events must be:
-
-- Immutable  
-- Self-contained  
-- Serializable  
-
----
-
-# 6. STATE MANAGEMENT RULES
+- State transitions MUST be validated
+- Invalid transitions MUST be rejected
+- States MUST NOT be skipped
+- Trade MUST always end in COMPLETED state
 
 ---
 
-## 6.1 TradeContext
+# 11. EXECUTION INFRASTRUCTURE RULES
 
-- All trade state must exist inside TradeContext  
-- No hidden state outside TradeContext  
-
----
-
-## 6.2 Stateless Core
-
-- No static mutable variables  
-- No global shared state  
-- Core engine must remain stateless  
+- Execution layer MUST be interface-driven
+- Broker implementations MUST be pluggable
+- Core system MUST NOT branch on broker type
+- Execution MUST be replaceable without affecting core logic
 
 ---
 
-## 6.3 Replayability
+# 12. REGISTRY PATTERN RULES
 
-- TradeContext must be serializable  
-- System must support event replay  
-
----
-
-# 7. EXIT ENGINE RULES (CRITICAL)
+- All extensibility MUST use registries
+- New components MUST be registered, not hardcoded
+- Factory pattern MUST be used for object creation
 
 ---
 
-## 7.1 Independence
+# 13. FORBIDDEN IMPLEMENTATION PATTERNS
 
-Exit Engine must be:
-
-- Entry-agnostic  
-- Strategy-agnostic  
-- Broker-agnostic  
-
----
-
-## 7.2 Non-Negotiable Invariants
-
-The following rules must never be violated:
-
-- Stop loss must never decrease  
-- Capital protection must precede profit protection  
-- Exit logic must not change mid-trade  
-- All trades must be intraday  
-- Forced end-of-day exit must always execute  
+- switch-case based type handling
+- if-else chains for strategy selection
+- static mutable state
+- global variables
+- hidden singletons
+- circular dependencies
+- cross-module direct method calls
 
 ---
 
-## 7.3 Forbidden Behavior
+# 14. STATE MANAGEMENT RULES
 
-- Using entry logic inside exit logic  
-- Changing strategy during trade  
-- Loosening stop loss  
-- Introducing predictive or adaptive behavior  
-
----
-
-# 8. REGISTRY PATTERN (MANDATORY)
+- State MUST be explicit
+- State MUST NOT be globally shared
+- State MUST be scoped to context objects
+- Trade state MUST reside inside TradeContext
 
 ---
 
-## 8.1 Required Registries
+# 15. CONFIGURATION RULES
 
-- IndicatorRegistry  
-- EntryStrategyRegistry  
-- ExitStrategyRegistry  
-
----
-
-## 8.2 Rules
-
-- No switch-case extensibility  
-- No if-else chains for type selection  
-- Use metadata and factory pattern  
+- Configuration MUST be externalized
+- Configuration MUST NOT be hardcoded
+- Runtime behavior MUST be configurable without code changes
 
 ---
 
-## 8.3 Example
+# 16. LOGGING RULES
 
-```java
-registry.register(
-    new IndicatorDefinition(
-        metadata,
-        config -> new CustomIndicator(config)
-    )
-);
+- Logging MUST be structured
+- All major state transitions MUST be logged
+- All trade-related events MUST include identifiers
 
 ---
 
-# 9. INDICATOR RULES
+# 17. TESTABILITY RULES
 
-## 9.1 Execution Rules
-
-- Indicators must be computed once per instrument  
-- Results must be shared across strategies  
-
-## 9.2 Performance Rules
-
-- Streaming indicators must operate in O(1)  
-- Avoid redundant recalculations  
-
-## 9.3 Structure Rules
-
-Separate:
-
-- Algorithm (stateless)  
-- State (memory objects)  
+- All modules MUST be independently testable
+- Business logic MUST be isolated from infrastructure
+- Deterministic behavior MUST be testable
 
 ---
 
-# 10. STRATEGY RULES
+# 18. PERFORMANCE RULES
 
-## 10.1 Structure
-
-Strategies must be:
-
-- Declarative  
-- Built as condition trees  
-
-## 10.2 Forbidden
-
-- Hardcoded strategies  
-- Mixing evaluation and execution  
-- Embedding indicator logic inside strategies  
+- Indicator computation MUST avoid duplication
+- Streaming operations MUST be constant time
+- Event processing MUST be non-blocking
+- System MUST support multi-instrument processing
 
 ---
 
-# 11. EXECUTION RULES
+# 19. EXTENSIBILITY RULES
 
-## 11.1 Broker Isolation
-
-- Broker logic must exist only in execution-infrastructure  
-- Core engine must not depend on broker implementations  
-
-## 11.2 Adapter Pattern
-
-Each broker must implement:
-
-- MarketDataFeed  
-- OrderExecutor  
+- New functionality MUST NOT require modification of existing modules
+- Extension points MUST be clearly defined
+- Plugins MUST integrate through interfaces only
 
 ---
 
-# 12. CONFIGURATION RULES
+# 20. FINAL RULE
 
-## 12.1 Externalization
+If any implementation violates:
 
-Configuration must be externalized via:
+- determinism
+- modularity
+- separation of concerns
+- exit engine independence
 
-- YAML  
-- Environment variables  
-- API  
-- Database  
-
-## 12.2 Forbidden
-
-- Hardcoded values  
-- Magic numbers  
+It MUST be rejected.
 
 ---
 
-# 13. LOGGING RULES
-
-## 13.1 Mandatory Logging
-
-All modules must log:
-
-- Key events  
-- State transitions  
-- Errors  
-
-## 13.2 Structured Logging
-
-Logs must include:
-
-- tradeId  
-- instrument  
-- eventType  
-- timestamp  
-
----
-
-# 14. TESTABILITY RULES
-
-## 14.1 Requirements
-
-- All modules must be unit testable  
-- No hidden dependencies  
-
-## 14.2 Coverage
-
-Minimum test coverage: 90%+
-
----
-
-# 15. PERFORMANCE RULES
-
-- No blocking operations in event flow  
-- No redundant computations  
-- Efficient memory usage  
-
----
-
-# 16. FORBIDDEN ANTI-PATTERNS
-
-The following are strictly forbidden:
-
-- God classes  
-- Static mutable state  
-- Circular dependencies  
-- Tight coupling  
-- Business logic in domain models  
-- Switch-case extensibility  
-- Hidden side effects  
-
----
-
-# 17. CODE REVIEW CHECKLIST
-
-Every pull request must verify:
-
-- SOLID compliance  
-- No module boundary violations  
-- Registry pattern usage  
-- Tests included  
-- Logging present  
-- No forbidden patterns  
-
----
-
-# 18. FINAL RULE
-
-If any design:
-
-- Breaks modularity  
-- Breaks determinism  
-- Breaks exit engine independence  
-
-It must be rejected.
+# END OF FILE

@@ -2,8 +2,8 @@
 ## Trading Platform & Exit Engine Ecosystem
 
 Version: 1.0  
-Purpose: Define the identity, philosophy, and intent of the system.  
-Audience: Codex, Developers, Architects  
+Scope: Product Identity & Philosophy Only  
+Audience: Product Owners, Architects, Developers  
 
 ---
 
@@ -11,331 +11,286 @@ Audience: Codex, Developers, Architects
 
 ## 1.1 What This System Is
 
-This system is a **modular algorithmic trading engine ecosystem**.
+This system is a **modular algorithmic trading engine ecosystem** designed to support:
 
-It is designed to support:
+- indicator computation
+- strategy composition
+- entry signal generation
+- exit risk management
+- market scanning
+- broker execution
+- simulation and research
 
-- Indicator computation
-- Strategy composition
-- Entry signal generation
-- Exit risk management
-- Market scanning
-- Broker execution
-- Simulation and research
-
-The system is composed of **independent engines**, each responsible for a single domain.
-
-At the core of the system lies the:
-
-> **Exit Engine — a deterministic risk and exit management engine**
+The system is composed of **independent engines**, each responsible for a specific function in the trading lifecycle.
 
 ---
 
-## 1.2 What This System Is NOT
+## 1.2 Core Component
+
+At the center of the system is:
+
+> EXIT ENGINE
+
+The exit engine is responsible for:
+
+- managing active trades
+- enforcing risk discipline
+- protecting capital
+- structuring profit ownership
+
+It operates independently of:
+
+- entry strategies
+- broker implementations
+- market prediction logic
+
+---
+
+## 1.3 What This System Is NOT
 
 This system is NOT:
 
-- A prediction engine
-- A signal-selling system
-- A profit maximization system
-- A discretionary trading tool
-- A machine learning system (in core logic)
-- A portfolio optimizer
+- a signal generator
+- a prediction engine
+- a profit guarantee system
+- a discretionary trading assistant
+- a machine learning system
 
-The system does NOT attempt to:
-
-- Predict market direction
-- Optimize exits dynamically mid-trade
-- Guarantee profits
+It does not attempt to predict markets or optimize outcomes dynamically.
 
 ---
 
-## 1.3 Core System Role
+# 2. WHY THIS SYSTEM EXISTS
 
-The system acts as:
+Most trading systems fail due to poor exit behavior.
 
-> A **decision and execution infrastructure layer** for algorithmic trading
+Common problems:
 
-It separates:
+- exiting early due to fear
+- holding losses too long
+- giving back profits
+- inconsistent decision making
 
-- Strategy logic (entry)
-- Risk logic (exit)
-- Execution logic (broker)
+This system exists to:
 
----
-
-# 2. CORE PHILOSOPHY
-
-## 2.1 Capital Preservation First
-
-The system is built on one primary rule:
-
-> **Survival precedes profitability**
-
-The system must always ensure:
-
-- Losses are bounded
-- Capital is protected
-- Trades are never left unmanaged
-
-Profit is secondary.
+- externalize discipline
+- enforce consistent exit behavior
+- reduce emotional decision making
+- provide structured risk control
 
 ---
 
-## 2.2 Exits Over Entries
+# 3. CORE PHILOSOPHY
+
+---
+
+## 3.1 Capital First
+
+Capital preservation is the primary objective.
+
+- survival precedes profit
+- losses must be controlled
+- capital must not be exposed unnecessarily
+
+Profit is a secondary outcome.
+
+---
+
+## 3.2 Exits Over Entries
+
+Entries are abundant.
+
+Exits determine outcomes.
+
+This system prioritizes:
+
+- how trades are managed
+- how risk is controlled
+- how profit is protected
+
+---
+
+## 3.3 Predictability Over Optimization
+
+The system prioritizes:
+
+- consistent behavior
+- repeatable outcomes
+- stability under stress
+
+It does not attempt to:
+
+- chase optimal exits
+- adapt unpredictably
+- overfit market conditions
+
+---
+
+## 3.4 Separation of Concerns
+
+Each part of the system has a single responsibility.
+
+- entry decides when to enter
+- exit decides when to exit
+- indicators provide data
+- execution handles orders
+
+No component overlaps responsibility.
+
+---
+
+## 3.5 Human-Aware Design
 
 The system assumes:
 
-- Entries are abundant
-- Exits determine outcomes
+- users may override decisions
+- users may act emotionally
+- users may not follow ideal behavior
 
-Therefore:
-
-> The Exit Engine is the most critical component
-
----
-
-## 2.3 Deterministic Behavior
-
-The system must behave predictably.
-
-Rules:
-
-- Same input → same output
-- No randomness in core logic
-- No hidden state changes
-- No adaptive behavior during live trade
-
-All decisions must be:
-
-- Explainable
-- Repeatable
-- Testable
+The system is designed to remain stable even under imperfect usage.
 
 ---
 
-## 2.4 Separation of Concerns
-
-Each module has exactly one responsibility.
-
-Strict separation:
-
-| Concern | Module |
-|--------|--------|
-Indicators | indicators-engine |
-Strategy logic | strategy-composition |
-Entry logic | entry-engine |
-Exit logic | exit-engine |
-Market data | market-data-engine |
-Scanning | scanner-engine |
-Execution | execution-infrastructure |
-Lifecycle | trade-lifecycle |
-
-No module is allowed to perform another module’s responsibility.
+# 4. CORE ASSUMPTIONS
 
 ---
 
-## 2.5 Plugin-Based Extensibility
+## 4.1 Market Assumptions
 
-The system must be extendable without modifying core code.
-
-All extensions must use:
-
-- Registry pattern
-- Factory pattern
-
-Examples:
-
-- IndicatorRegistry
-- EntryStrategyRegistry
-- ExitStrategyRegistry
-
-Rules:
-
-- No switch-case extensions
-- No hardcoding logic branches
-- No modification of existing core classes
+- markets are noisy in the short term
+- trends are intermittent
+- volatility is uneven
+- intraday movements are not smooth
 
 ---
 
-## 2.6 Event-Driven Architecture
+## 4.2 User Assumptions
 
-All modules communicate via events.
-
-Rules:
-
-- No direct coupling between engines
-- No direct method calls across modules
-- Communication must happen via events only
-
-Examples:
-
-- MarketTickEvent
-- IndicatorUpdatedEvent
-- EntrySignalEvent
-- ExitTriggeredEvent
+- entries may be imperfect
+- exits may be overridden
+- discipline may vary
 
 ---
 
-# 3. SYSTEM SCOPE
+## 4.3 Execution Assumptions
 
-## 3.1 Supported Capabilities
+- slippage exists
+- costs exist
+- execution is not instantaneous
+- data may have latency
+
+---
+
+# 5. PRODUCT SCOPE
 
 The system supports:
 
-- Indicator computation (batch + streaming)
-- Strategy definition using condition trees
-- Entry signal generation
-- Exit risk management
-- Multi-instrument scanning
-- Trade lifecycle management
-- Broker execution
-- Simulation and replay
+- indicator computation
+- strategy composition
+- entry signal generation
+- exit management
+- trade lifecycle control
+- market scanning
+- execution integration
 
----
+The system does not support:
 
-## 3.2 Supported Trading Modes
-
-The system supports:
-
-- Simulation Mode
-- Historical Replay Mode
-- Paper Trading Mode
-- Live Trading Mode
-
-Each mode must behave consistently with system rules.
-
----
-
-# 4. EXIT ENGINE POSITIONING
-
-## 4.1 Core Responsibility
-
-The Exit Engine is responsible for:
-
-- Stop loss management
-- Profit protection
-- Ownership logic
-- Risk enforcement
-- Forced exits
-
----
-
-## 4.2 Independence Rules
-
-The Exit Engine must be:
-
-- Entry-agnostic
-- Broker-agnostic
-- Strategy-agnostic
-
-It must NOT:
-
-- Know entry logic
-- Depend on strategy implementation
-- Contain broker-specific code
-
----
-
-## 4.3 Non-Negotiable Invariants
-
-The following rules must NEVER be violated:
-
-- Stop loss must NEVER decrease
-- All trades must be intraday
-- Manual exit must always be allowed
-- Exit logic must not change mid-trade
-- Capital protection must precede profit protection
-- Forced end-of-day exit must always execute
-
-Violation of these rules breaks system identity.
-
----
-
-# 5. TRADE LIFECYCLE PHILOSOPHY
-
-Every trade is treated as a lifecycle.
-
-## Phases:
-
-1. Initial Risk  
-2. Capital Protection  
-3. Profit Ownership  
-4. Time-Based Exit  
-
-Each phase has:
-
-- Defined purpose
-- Defined behavior
-- Defined transition conditions
-
-No phase skipping.
+- discretionary trading advice
+- predictive analytics
+- portfolio optimization (current scope)
 
 ---
 
 # 6. TARGET USERS
 
-The system is designed for:
+This system is designed for:
 
-- Algorithmic traders
-- Quant developers
-- Strategy builders
-- Semi-automated traders
+- algorithmic traders
+- system-based traders
+- developers building trading systems
+- traders seeking structured risk management
 
-The system is NOT designed for:
+This system is not intended for:
 
-- Beginners
-- Fully discretionary traders
-- Users seeking guaranteed profits
-
----
-
-# 7. NON-FUNCTIONAL REQUIREMENTS
-
-The system must ensure:
-
-## Determinism
-- Same behavior across runs
-
-## Performance
-- O(1) streaming indicators
-- No redundant calculations
-
-## Reliability
-- No unmanaged trades
-- Consistent lifecycle transitions
-
-## Observability
-- Structured logging mandatory
-
-## Extensibility
-- New components added without modifying core
+- beginners with no trading understanding
+- users expecting guaranteed profit
+- fully discretionary traders
 
 ---
 
-# 8. LONG-TERM VISION
-
-The system will evolve into:
-
-- A trading engine platform
-- A strategy plugin ecosystem
-- A multi-broker execution layer
-- A SaaS trading infrastructure
-- A developer platform
-
----
-
-# 9. FINAL PRINCIPLE
+# 7. SYSTEM CHARACTERISTICS
 
 The system is designed to be:
 
-- Modular
-- Deterministic
-- Extensible
-- Broker-independent
-- Entry-independent
-
-> The Exit Engine is the core asset.  
-> All other modules are replaceable.
+- modular
+- deterministic
+- extensible
+- broker-independent
+- entry-independent
 
 ---
+
+# 8. EVOLUTION STRATEGY
+
+The system will evolve in stages:
+
+Stage 1  
+Core engines (indicators, entry, exit)
+
+Stage 2  
+Simulation and backtesting
+
+Stage 3  
+Broker integrations
+
+Stage 4  
+API and UI layers
+
+Stage 5  
+Multi-tenant SaaS platform
+
+---
+
+# 9. LONG-TERM VISION
+
+The long-term goal is to build a:
+
+> UNIVERSAL TRADING ENGINE PLATFORM
+
+Capabilities will include:
+
+- strategy marketplace
+- plug-and-play trading engines
+- multi-broker support
+- developer ecosystem
+- SaaS deployment
+
+---
+
+# 10. SUCCESS CRITERIA
+
+The system is successful if it:
+
+- consistently enforces risk discipline
+- prevents large uncontrolled losses
+- produces predictable behavior
+- supports multiple strategies and instruments
+- remains extensible without redesign
+
+---
+
+# 11. FINAL PRINCIPLE
+
+This system does not promise profit.
+
+It provides:
+
+- structure
+- discipline
+- risk control
+
+Profit is the result of correct usage.
+
+---
+
+# END OF FILE
