@@ -364,15 +364,15 @@ Create package roots for each module.
 
 Examples:
 
-- `com.kb.trading.domain`
-- `com.kb.trading.orchestrator`
-- `com.kb.trading.marketdata`
-- `com.kb.trading.indicators`
-- `com.kb.trading.strategy`
-- `com.kb.trading.entry`
-- `com.kb.trading.lifecycle`
-- `com.kb.trading.exit`
-- `com.kb.trading.execution`
+- `com.kbquants.domain`
+- `com.kbquants.orchestrator`
+- `com.kbquants.marketdata`
+- `com.kbquants.indicators`
+- `com.kbquants.strategy`
+- `com.kbquants.entry`
+- `com.kbquants.lifecycle`
+- `com.kbquants.exit`
+- `com.kbquants.execution`
 
 #### Dependency control
 
