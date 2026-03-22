@@ -217,7 +217,7 @@ Minimum MVP responsibilities:
 
 Important note:
 
-For MVP, use **synchronous deterministic dispatch** rather than asynchronous execution. Concurrency can be introduced later once core behavior is proven stable.
+For MVP, use **non-blocking ordered dispatch** so publishers hand off immutable events without waiting on subscriber work, while the event bus still preserves deterministic delivery order for reproducible behavior. A single-writer queue or equivalent ordered dispatcher is acceptable for MVP as long as listeners are not invoked on the publisher call path.
 
 ## 6.3 `market-data-engine`
 
